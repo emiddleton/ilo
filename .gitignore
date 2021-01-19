@@ -1,0 +1,9 @@
+/target
+Cargo.lock
+samples
+*.pdf
+*.zip
+*.htm
+*.xml
+endpoint*.json
+auth*.json

@@ -1,0 +1,2 @@
+[workspace]
+members = ["ilo_console", "ilo_ribcl", "ilo_ribcl_derive"]
