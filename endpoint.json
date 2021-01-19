@@ -1,0 +1,7 @@
+{
+  "auth": {
+    "hostname": "ILO-IPADDRESS",
+    "username": "ILO-USERNAME",
+    "password": "ILO-PASSWORD"
+  }
+}
