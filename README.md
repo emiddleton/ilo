@@ -4,7 +4,6 @@ Rust libraries and tools for interacting with HP iLO 2,3,4.  This is still early
 
 ## Overview
 
-ilo is a set of libraries and tool
 iLO is a set of libraries and tools to interact with the hardware controller or integrated lights out
 (iLO version 2,3,4) in HP ProLiant servers. These controllers allows you to do things like check the
 hardware status, power cycle the server and run a KVM remote console.
@@ -96,3 +95,8 @@ a tool to turn on/off power on a server
 ```
 cargo run --release --bin power -- --cold-boot
 ```
+
+## Contributors
+
+* Edward Middleton
+* Kaito Ide
