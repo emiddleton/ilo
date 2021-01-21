@@ -11,7 +11,23 @@ hardware status, power cycle the server and run a KVM remote console.
 
 ## Tools
 
+The tools are built with statically compiled libraries using [Vcpkg](https://github.com/microsoft/vpkg).  To
+install the required libraries you need the [cargo-vcpkg](https://crates.io/crates/cargo-vcpkg) which can be
+installed with the following command.
+
+```
+cargo install cargo-vcpkg
+```
+
+To install the statically compiled libraries required to compile the tools use the following command
+
+```
+cargo vcpkg build
+```
+
 ### console
+
+[![Demo of console](https://emiddleton.github.io/ilo-console.gif)](https://www.youtube.com/watch?v=WBbkc5Nt--s)
 
 A tool for connecting to iLO 2 and displaying a virtual screen using using sdl2 with the contents that
 would be displayed if a monitor was connected to the server.  It currently allows keyboard but not mouse

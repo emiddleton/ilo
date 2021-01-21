@@ -79,6 +79,7 @@
         "structs",
         "symmetriccipher",
         "trapcommunity",
-        "trybuild"
+        "trybuild",
+        "vcpkg"
     ]
 }
