@@ -27,7 +27,7 @@ cargo vcpkg build
 
 ### console
 
-[![Demo of console](https://videos.vortorus.net/videos/ilo-console.gif)](https://www.youtube.com/watch?v=WBbkc5Nt--s)
+[![Demo of console](https://emiddleton.github.io/ilo-console.gif)](https://www.youtube.com/watch?v=WBbkc5Nt--s)
 
 A tool for connecting to iLO 2 and displaying a virtual screen using using sdl2 with the contents that
 would be displayed if a monitor was connected to the server.  It currently allows keyboard but not mouse
