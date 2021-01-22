@@ -163,7 +163,7 @@ macro_rules! ribcl_command {
                 $value.into_ribcl()?
             )?
         };
-        ribcl_footer!($writer, $section_name, $command_name)?;
+        ribcl_footer!($writer, $section_name)?;
     }};
     (@inner $writer:ident, $credentials:expr, $section_name:ident, $mode:ident, $command_name:ident, $command:expr) => {{
         ribcl_header!($writer, $credentials, $section_name, $mode, $command_name)?;
