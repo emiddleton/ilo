@@ -414,6 +414,16 @@ macro_rules! get_method{
 
 }
 macro_rules! mod_method {
+    (@parse_response $response:tt) => {
+        match ribcl_parse_response!($response) {
+            Err(crate::commands::Error::BuilderParse{
+                source: crate::builder_parse::Error::NotFound{target: _}, ..
+            }) => Ok(()),
+            Ok(Err(err)) => Err(crate::commands::Error::BuilderParse{source: err.into(), target: ""}),
+            Err(err) => Err(err.into()),
+            Ok(_) => unreachable!()
+        }
+    };
     (
         $(#[$outer:meta])+
         $mod:ident.$fn_name:ident : $tag_name:literal
@@ -426,14 +436,7 @@ macro_rules! mod_method {
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $tag_name);
             let response = self.send(request.into_bytes()).await?;
-            match ribcl_parse_response!(response) {
-                Ok(_) | Err(crate::commands::Error::BuilderParse{
-                    source: crate::builder_parse::Error::NotFound{target: _}, ..
-                }) => Ok(()),
-                Err(err) => {
-                    Err(err)
-                },
-            }
+            mod_method!(@parse_response response)
         }
     };
 
@@ -446,21 +449,14 @@ macro_rules! mod_method {
         pub async fn $fn_name(
             &mut self,
             arg: $arg_type,
-        ) -> Result<$arg_type, crate::commands::Error> {
+        ) -> Result<(), crate::commands::Error> {
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $fn_name, {
                 use crate::write_ribcl::WriteRibcl;
                 arg.write_ribcl(&mut request)?;
             });
             let response = self.send(request.into_bytes()).await?;
-            match ribcl_parse_response!(response) {
-                Ok(_) | Err(crate::commands::Error::BuilderParse{
-                    source: crate::builder_parse::Error::NotFound{target: _}, ..
-                }) => Ok((arg)),
-                Err(err) => {
-                    Err(err)
-                },
-            }
+            mod_method!(@parse_response response)
         }
     };
 
@@ -474,14 +470,7 @@ macro_rules! mod_method {
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $fn_name);
             let response = self.send(request.into_bytes()).await?;
-            match ribcl_parse_response!(response) {
-                Ok(_) | Err(crate::commands::Error::BuilderParse{
-                    source: crate::builder_parse::Error::NotFound{target: _}, ..
-                }) => Ok(()),
-                Err(err) => {
-                    Err(err)
-                },
-            }
+            mod_method!(@parse_response response)
         }
     };
 
@@ -491,7 +480,7 @@ macro_rules! mod_method {
     ) => {
         $(#[$outer])+
         #[tracing::instrument(skip(self))]
-        pub async fn $fn_name(&mut self, arg: $arg_type) -> Result<$arg_type, crate::commands::Error> {
+        pub async fn $fn_name(&mut self, arg: $arg_type) -> Result<(), crate::commands::Error> {
             assert_fw!(self.firmware(), $requirements_msg, $( (  $($conditions),* ) ),*);
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $fn_name, {
@@ -499,36 +488,21 @@ macro_rules! mod_method {
                 arg.write_ribcl(&mut request)?;
             });
             let response = self.send(request.into_bytes()).await?;
-            match ribcl_parse_response!(response) {
-                Ok(_) | Err(crate::commands::Error::BuilderParse{
-                    source: crate::builder_parse::Error::NotFound{target: _}, ..
-                }) => Ok((arg)),
-                Err(err) => {
-                    Err(err)
-                },
-            }
+            mod_method!(@parse_response response)
         }
     };
-
     (
         $(#[$outer:meta])+
         $mod:ident.$fn_name:ident ($attr_name:literal : $($arg_type:ty)+ ) $(, $requirements_msg:literal, $( ( $($conditions:tt),* ) ),*)?
     ) => {
         $(#[$outer])+
         #[tracing::instrument(skip(self))]
-        pub async fn $fn_name(&mut self, arg: $($arg_type)+) -> Result<$($arg_type)+, crate::commands::Error> {
+        pub async fn $fn_name(&mut self, arg: $($arg_type)+) -> Result<(), crate::commands::Error> {
             assert_fw!(self.firmware(), $($requirements_msg, $( (  $($conditions),+ ) ),*)*);
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $fn_name, $attr_name, arg);
             let response = self.send(request.into_bytes()).await?;
-            match ribcl_parse_response!(response) {
-                Ok(_) | Err(crate::commands::Error::BuilderParse{
-                    source: crate::builder_parse::Error::NotFound{target: _}, ..
-                }) => Ok((arg)),
-                Err(err) => {
-                    Err(err)
-                },
-            }
+            mod_method!(@parse_response response)
         }
     };
     (
@@ -542,14 +516,7 @@ macro_rules! mod_method {
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $fn_name);
             let response = self.send(request.into_bytes()).await?;
-            match ribcl_parse_response!(response) {
-                Ok(_) | Err(crate::commands::Error::BuilderParse{
-                    source: crate::builder_parse::Error::NotFound{target: _}, ..
-                }) => Ok(()),
-                Err(err) => {
-                    Err(err)
-                },
-            }
+            mod_method!(@parse_response response)
         }
     };
 }
