@@ -1,5 +1,5 @@
-use anyhow::Result;
-use ilo_ribcl::parse_node_auth;
+use anyhow::{anyhow, Result};
+use ilo_ribcl::{parse_node_auth, power::PowerStatus};
 use ilo_ribcl_derive::ribcl_auth;
 use structopt::StructOpt;
 use tracing_subscriber::{filter::EnvFilter, FmtSubscriber};
@@ -11,21 +11,16 @@ use tracing_subscriber::{filter::EnvFilter, FmtSubscriber};
     about = "use API to simulate pressing the power button"
 )]
 struct Opt {
-    /// Activate debug mode
-    #[structopt(short, long)]
-    debug: bool,
+    /// Is one of on or off
+    command: String,
 
-    /// Cold boot node
+    /// Force cold boot or Shutdown.
     #[structopt(short, long)]
-    cold_boot: bool,
-
-    /// Warm boot node
-    #[structopt(short, long)]
-    warm_boot: bool,
+    force: bool,
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     let opt = Opt::from_args();
 
     // setup tracing
@@ -36,10 +31,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // load auth
     let mut node = parse_node_auth!(opt);
 
-    match (opt.cold_boot, opt.warm_boot) {
-        (true, _) => node.cold_boot_server().await?,
-        (_, true) => node.warm_boot_server().await?,
-        _ => node.press_pwr_btn().await?,
+    match opt.command.as_str() {
+        "on" => {
+            if opt.force {
+                node.cold_boot_server().await?;
+            } else {
+                node.set_host_power(PowerStatus::On).await?;
+            }
+        }
+        "off" => {
+            if opt.force {
+                if let PowerStatus::On = node.get_host_power_status().await? {
+                    node.press_pwr_btn().await?;
+                } else {
+                    println!("the server is already powered off");
+                }
+            } else {
+                node.set_host_power(PowerStatus::Off).await?;
+            }
+        }
+        command => {
+            return Err(anyhow!(
+                "Invalid command: {}\nmust be one of on off",
+                command
+            ));
+        }
     }
     Ok(())
 }

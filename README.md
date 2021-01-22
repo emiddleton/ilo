@@ -92,8 +92,22 @@ cargo run --release --bin info -- --endpoint endpoint.json
 ### power
 a tool to turn on/off power on a server
 
+#### Power on
+
 ```
-cargo run --release --bin power -- --cold-boot
+cargo run --release --bin power -- on
+```
+
+#### safe (ACPI) power off
+
+```
+cargo run --release --bin power -- off
+```
+
+#### force (unsafe) power off
+
+```
+cargo run --release --bin power -- off --force
 ```
 
 ## Contributors
