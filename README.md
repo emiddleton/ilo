@@ -36,7 +36,7 @@ as shown bellow.
 
 ```json
 {
-  "hostname": "ILO-IPADDRESS",
+  "hostname": "ILO-IP-ADDRESS",
   "username": "ILO-USERNAME",
   "password": "ILO-PASSWORD"
 }
@@ -55,7 +55,7 @@ The remaining tools require credentials in a json file named *endpoint.json* as 
 ```json
 {
   "auth": {
-    "hostname": "ILO-IPADDRESS",
+    "hostname": "ILO-IP-ADDRESS",
     "username": "ILO-USERNAME",
     "password": "ILO-PASSWORD"
   }
