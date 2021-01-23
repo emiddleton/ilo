@@ -39,7 +39,7 @@ impl client::Node {
             device.into_ribcl()?
         )?;
         ribcl_footer!(request, rib_info)?;
-        let response = self.send(request.into_bytes()).await?;
+        let response = self.send_ribcl(request.into_bytes()).await?;
         Ok(
             ribcl_parse_response!(response, "get_vm_status" -> VmStatus)?.map_err(|source| {
                 commands::Error::BuilderParse {
@@ -78,7 +78,7 @@ impl client::Node {
         ribcl_tag!(request, vm_status, write_protect: vm_write_protect);
         write!(request, "</set_vm_status>")?;
         ribcl_footer!(request, rib_info)?;
-        let response = self.send(request.into_bytes()).await?;
+        let response = self.send_ribcl(request.into_bytes()).await?;
         mod_method!(@parse_response response)
     }
 
@@ -104,7 +104,7 @@ impl client::Node {
             image_url.into_ribcl()?
         )?;
         ribcl_footer!(request, rib_info)?;
-        let response = self.send(request.into_bytes()).await?;
+        let response = self.send_ribcl(request.into_bytes()).await?;
         mod_method!(@parse_response response)
     }
 

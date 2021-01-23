@@ -288,7 +288,7 @@ simple_builder_def!(String, {
         if value.is_empty() {
             Ok(None)
         } else {
-            Ok(Some(value))
+            Ok(Some(value.trim().to_string()))
         }
     }
 });
@@ -334,13 +334,21 @@ pub type NaiveDateTimeBuilder = SimpleBuilder<NaiveDateTime>;
 simple_builder_def!(NaiveDateTime, {
     |value| match value.to_ascii_lowercase().as_str() {
         "[not set]" => Ok(None),
-        dts => match NaiveDateTime::parse_from_str(dts, "%m/%d/%Y %H:%M") {
-            Ok(dt) => Ok(Some(dt)),
-            Err(_) => Err(Error::InvalidString {
-                target: "NaiveDateTime",
-                value,
-            }),
-        },
+        _ => {
+            match ["%m/%d/%Y %H:%M", "%a %b %e %H:%M:%S %Y"]
+                .iter()
+                .find_map(|fmt| NaiveDateTime::parse_from_str(value.as_str(), fmt).ok())
+            {
+                None => match NaiveDate::parse_from_str(value.as_str(), "%m-%d-%Y") {
+                    Err(_) => Err(Error::InvalidString {
+                        target: "NaiveDateTime",
+                        value,
+                    }),
+                    Ok(val) => Ok(Some(val.and_hms(0, 0, 0))),
+                },
+                val => Ok(val),
+            }
+        }
     }
 });
 
@@ -350,7 +358,7 @@ simple_builder_def!(NaiveDate, {
         if "[not set]" == value.to_ascii_lowercase().as_str() {
             return Ok(None);
         }
-        ["%m/%d/%Y", "%b %d %Y"]
+        ["%m/%d/%Y", "%b %d %Y", "%m-%d-%Y"]
             .iter()
             .find_map(|fmt| NaiveDate::parse_from_str(value.as_str(), fmt).ok())
             .ok_or(Error::InvalidString {

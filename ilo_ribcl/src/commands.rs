@@ -1,4 +1,4 @@
-use crate::{builder_parse, client, into_ribcl, write_ribcl};
+use crate::{builder_parse, client, into_ribcl, write_ribcl, xml};
 #[cfg(feature = "backtrace")]
 use std::backtrace::Backtrace;
 use thiserror::Error;
@@ -77,6 +77,14 @@ pub enum Error {
     FieldMissing {
         // name of the unset field
         target: &'static str,
+    },
+    /// Error occurred processing xml
+    #[error("{source}")]
+    Xml {
+        #[from]
+        source: xml::Error,
+        #[cfg(feature = "backtrace")]
+        backtrace: Backtrace,
     },
 }
 
@@ -303,7 +311,7 @@ macro_rules! get_method{
                 read,
                 $fn_name
             );
-            let response = self.send(request.into_bytes()).await?;
+            let response = self.send_ribcl(request.into_bytes()).await?;
             Ok(
                 ribcl_parse_response!(@final response [$($resp_tag)+] [$($ret_type)+])?.map_err(
                     |source| $crate::commands::Error::BuilderParse{
@@ -442,7 +450,7 @@ macro_rules! mod_method {
         ) -> Result<(), crate::commands::Error> {
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $tag_name);
-            let response = self.send(request.into_bytes()).await?;
+            let response = self.send_ribcl(request.into_bytes()).await?;
             mod_method!(@parse_response response)
         }
     };
@@ -462,7 +470,7 @@ macro_rules! mod_method {
                 use crate::write_ribcl::WriteRibcl;
                 arg.write_ribcl(&mut request)?;
             });
-            let response = self.send(request.into_bytes()).await?;
+            let response = self.send_ribcl(request.into_bytes()).await?;
             mod_method!(@parse_response response)
         }
     };
@@ -476,7 +484,7 @@ macro_rules! mod_method {
         pub async fn $fn_name(&mut self) -> Result<(), crate::commands::Error> {
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $fn_name);
-            let response = self.send(request.into_bytes()).await?;
+            let response = self.send_ribcl(request.into_bytes()).await?;
             mod_method!(@parse_response response)
         }
     };
@@ -494,7 +502,7 @@ macro_rules! mod_method {
                 use $crate::write_ribcl::WriteRibcl;
                 arg.write_ribcl(&mut request)?;
             });
-            let response = self.send(request.into_bytes()).await?;
+            let response = self.send_ribcl(request.into_bytes()).await?;
             mod_method!(@parse_response response)
         }
     };
@@ -508,7 +516,7 @@ macro_rules! mod_method {
             assert_fw!(self.firmware(), $($requirements_msg, $( (  $($conditions),+ ) ),*)*);
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $fn_name, $attr_name, arg);
-            let response = self.send(request.into_bytes()).await?;
+            let response = self.send_ribcl(request.into_bytes()).await?;
             mod_method!(@parse_response response)
         }
     };
@@ -522,7 +530,7 @@ macro_rules! mod_method {
             assert_fw!(self.firmware(), $requirements_msg, $( (  $($conditions),* ) ),*);
             let mut request = String::new();
             ribcl_command!(request, self.auth(), $mod, write, $fn_name);
-            let response = self.send(request.into_bytes()).await?;
+            let response = self.send_ribcl(request.into_bytes()).await?;
             mod_method!(@parse_response response)
         }
     };

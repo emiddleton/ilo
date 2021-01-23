@@ -189,11 +189,32 @@ impl Node {
 
     #[async_recursion(?Send)]
     #[instrument(skip(self))]
-    pub async fn send(&mut self, request: Vec<u8>) -> Result<String, Error> {
+    pub async fn send_ribcl(&mut self, request: Vec<u8>) -> Result<String, Error> {
         loop {
             let firmware = self.firmware.clone();
             match self.client {
-                Some(ref mut client) => return client.send(request).await,
+                Some(ref mut client) => return client.send_ribcl(request).await,
+                _ => match firmware {
+                    Some(firmware) => {
+                        let auth = self.auth.clone();
+                        self.client = Some(Self::client_from_auth_and_fw(&auth, &firmware)?);
+                    }
+                    _ => {
+                        let auth = self.auth.clone();
+                        *self = Self::auto_detect(auth).await?;
+                    }
+                },
+            }
+        }
+    }
+
+    #[async_recursion(?Send)]
+    #[instrument(skip(self))]
+    pub async fn get_xmldata(&mut self, item: &str) -> Result<String, Error> {
+        loop {
+            let firmware = self.firmware.clone();
+            match self.client {
+                Some(ref mut client) => return client.get_xmldata(item).await,
                 _ => match firmware {
                     Some(firmware) => {
                         let auth = self.auth.clone();
@@ -267,17 +288,22 @@ impl Node {
 
 #[async_trait]
 pub trait Client: std::fmt::Debug + Send {
-    async fn send(&mut self, request: Vec<u8>) -> Result<String, Error>;
+    async fn send_ribcl(&mut self, request: Vec<u8>) -> Result<String, Error>;
+    async fn get_xmldata(&mut self, item: &str) -> Result<String, Error>;
 }
 
 #[derive(Debug)]
 pub struct TlsClient {
     pub auth: Auth,
+    http_client: Option<reqwest::Client>,
 }
 
 impl TlsClient {
     pub fn new(auth: Auth) -> Self {
-        Self { auth }
+        Self {
+            auth,
+            http_client: None,
+        }
     }
 
     #[instrument(skip(self))]
@@ -290,12 +316,27 @@ impl TlsClient {
         let tls_stream = connector.connect(&self.auth.hostname, stream)?;
         Ok(tls_stream)
     }
+
+    #[instrument(skip(self))]
+    pub fn http_client(&mut self) -> Result<&mut Option<reqwest::Client>, Error> {
+        if self.http_client.is_none() {
+            let client = reqwest::Client::builder()
+                .danger_accept_invalid_certs(true)
+                .danger_accept_invalid_hostnames(true)
+                .use_native_tls()
+                .cookie_store(true)
+                .build()
+                .map_err(|source| Error::HttpsClientBuilder { source })?;
+            self.http_client = Some(client);
+        }
+        Ok(&mut self.http_client)
+    }
 }
 
 #[async_trait]
 impl Client for TlsClient {
     #[instrument(skip(self))]
-    async fn send(&mut self, request: Vec<u8>) -> Result<String, Error> {
+    async fn send_ribcl(&mut self, request: Vec<u8>) -> Result<String, Error> {
         let mut stream = self.tls_stream()?;
         stream
             .write_all(&request)
@@ -309,6 +350,18 @@ impl Client for TlsClient {
         let response = String::from_utf8(response)?;
         event!(Level::DEBUG, ?response);
         Ok(response)
+    }
+
+    async fn get_xmldata(&mut self, item: &str) -> Result<String, Error> {
+        let url = format!("https://{}:443/xmldata?item={}", &self.auth.hostname, item);
+        if let Some(client) = self.http_client()? {
+            event!(Level::DEBUG, item);
+            let response = client.get(&url).send().await?.text().await?;
+            event!(Level::DEBUG, ?response);
+            Ok(response)
+        } else {
+            Err(Error::HttpsConnection)
+        }
     }
 }
 
@@ -344,7 +397,7 @@ impl HttpsClient {
 
 #[async_trait]
 impl Client for HttpsClient {
-    async fn send(&mut self, request: Vec<u8>) -> Result<String, Error> {
+    async fn send_ribcl(&mut self, request: Vec<u8>) -> Result<String, Error> {
         let url = format!("https://{}:443/ribcl", &self.auth.hostname);
         if let Some(client) = self.http_client()? {
             event!(
@@ -352,6 +405,18 @@ impl Client for HttpsClient {
                 request = String::from_utf8_lossy(&request).as_ref()
             );
             let response = client.post(&url).body(request).send().await?.text().await?;
+            event!(Level::DEBUG, ?response);
+            Ok(response)
+        } else {
+            Err(Error::HttpsConnection)
+        }
+    }
+
+    async fn get_xmldata(&mut self, item: &str) -> Result<String, Error> {
+        let url = format!("https://{}:443/xmldata?item={}", &self.auth.hostname, item);
+        if let Some(client) = self.http_client()? {
+            event!(Level::DEBUG, item);
+            let response = client.get(&url).send().await?.text().await?;
             event!(Level::DEBUG, ?response);
             Ok(response)
         } else {
@@ -387,7 +452,7 @@ impl ProxyClient {
 
 #[async_trait]
 impl Client for ProxyClient {
-    async fn send(&mut self, request: Vec<u8>) -> Result<String, Error> {
+    async fn send_ribcl(&mut self, request: Vec<u8>) -> Result<String, Error> {
         let hash_id = self.hash_request(&request);
         let request_filename = format!("{}-{}-request.xml", self.auth.hostname, hash_id);
         let response_filename = format!("{}-{}-response.xml", self.auth.hostname, hash_id);
@@ -403,7 +468,24 @@ impl Client for ProxyClient {
             Ok(response)
         } else {
             File::create(&request_filename)?.write_all(&request)?;
-            let response = self.client.send(request).await?;
+            let response = self.client.send_ribcl(request).await?;
+            File::create(&response_filename)?.write_all(response.as_bytes())?;
+            Ok(response)
+        }
+    }
+
+    async fn get_xmldata(&mut self, item: &str) -> Result<String, Error> {
+        let hash_id = item;
+        let response_filename = format!("{}-{}-response.xml", self.auth.hostname, hash_id);
+        if Path::new(&response_filename).is_file() {
+            event!(Level::DEBUG, item);
+            let mut f = File::open(&response_filename)?;
+            let mut response = String::new();
+            f.read_to_string(&mut response)?;
+            event!(Level::DEBUG, ?response);
+            Ok(response)
+        } else {
+            let response = self.client.get_xmldata(item).await?;
             File::create(&response_filename)?.write_all(response.as_bytes())?;
             Ok(response)
         }

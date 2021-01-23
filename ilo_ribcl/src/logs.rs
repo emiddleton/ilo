@@ -33,7 +33,7 @@ impl client::Node {
     pub async fn get_ilo_event_log(&mut self) -> Result<Vec<LogEvent>, commands::Error> {
         let mut request = String::new();
         ribcl_command!(request, self.auth(), rib_info, read, get_event_log);
-        let response = self.send(request.into_bytes()).await?;
+        let response = self.send_ribcl(request.into_bytes()).await?;
         Ok(
             ribcl_parse_response!(response, "event_log" -> Vec<LogEvent>)?.map_err(|source| {
                 commands::Error::BuilderParse {
@@ -55,7 +55,7 @@ impl client::Node {
     pub async fn get_server_event_log(&mut self) -> Result<Vec<LogEvent>, commands::Error> {
         let mut request = String::new();
         ribcl_command!(request, self.auth(), server_info, read, get_event_log);
-        let response = self.send(request.into_bytes()).await?;
+        let response = self.send_ribcl(request.into_bytes()).await?;
         Ok(
             ribcl_parse_response!(response, "event_log" -> Vec<LogEvent>)?.map_err(|source| {
                 commands::Error::BuilderParse {

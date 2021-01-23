@@ -75,7 +75,7 @@ impl client::Node {
             }
             write!(request, "</set_persistent_boot/>")?;
         });
-        let response = self.send(request.into_bytes()).await?;
+        let response = self.send_ribcl(request.into_bytes()).await?;
         match ribcl_parse_response!(response) {
             Ok(_)
             | Err(crate::commands::Error::BuilderParse {
