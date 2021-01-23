@@ -27,7 +27,7 @@ impl client::Node {
     );
 
     get_method!(
-        /// Get the one time boot device
+        /// Returns the one time boot device
         server_info.get_one_time_boot -> "boot_type": Device,
         "iLO 4 or iLO 3 or iLO 2 version >= 2.06",
         (Ilo4),
@@ -45,7 +45,7 @@ impl client::Node {
     );
 
     get_method!(
-        /// get persistent boot
+        /// Returns persistent boot order
         server_info.get_persistent_boot -> "(get_)?persistent_boot" : BootDevices,
         "iLO 4 or iLO 3 or iLO 2 version >= 2.06",
         (Ilo4),
@@ -53,7 +53,7 @@ impl client::Node {
         (Ilo2, "2.06")
     );
 
-    /// Set the persistent boot order
+    /// Updates the persistent boot order
     #[tracing::instrument]
     pub async fn set_persistent_boot(
         &mut self,

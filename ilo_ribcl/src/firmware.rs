@@ -3,11 +3,11 @@ use std::{fs::File, io::Read, path::Path};
 
 impl client::Node {
     get_method!(
-        /// get firmware version
+        /// Returns information about the firmware
         rib_info.get_fw_version -> types::FwVersion
     );
 
-    /// update firmware
+    /// Update the iLO firmware
     #[tracing::instrument]
     pub async fn update_rib_firmware(&mut self, path: &Path) -> Result<(), commands::Error> {
         let mut f = File::open(path)?;

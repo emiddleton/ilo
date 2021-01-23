@@ -51,12 +51,12 @@ pub struct SnmpImSettings {
 
 impl client::Node {
     get_method!(
-        /// get snmp im settings
+        /// Returns the SNMP IM settings
         rib_info.get_snmp_im_settings -> SnmpImSettings
     );
 
     mod_method!(
-        /// set snmp im settings
+        /// Updates the SNMP IM settings
         rib_info.mod_snmp_im_settings(SnmpImSettings),
         "iLO 4 or iLO 3 version >= 1.20 or ilO 2",
         (Ilo4),

@@ -77,12 +77,12 @@ pub struct NetworkSettings {
 
 impl client::Node {
     get_method!(
-        /// get network settings
+        /// Returns the iLO network settings
         rib_info.get_network_settings -> NetworkSettings
     );
 
     mod_method!(
-        /// set network settings
+        /// Updates the iLO network settings
         rib_info.mod_network_settings(NetworkSettings)
     );
 }

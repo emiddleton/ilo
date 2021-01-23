@@ -370,7 +370,7 @@ pub struct EmbeddedHealthData {
 
 impl client::Node {
     get_method! {
-        /// this is documentation for get_embedded_health
+        /// Returns the servers health information
         server_info.get_embedded_health -> "get_embedded_health_data" : EmbeddedHealthData,
         "iLO 4 or iLO 3 or iLO 2 version >= 1.10",
         (Ilo4),(Ilo3),(Ilo2,"1.10")

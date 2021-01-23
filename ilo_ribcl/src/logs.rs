@@ -28,7 +28,7 @@ impl client::Node {
         rib_info.get_ilo_event_log : "get_event_log" -> "event_log" : Vec<types::LogEvent>
     );
     */
-    /// Get the full iLO event log
+    /// Returns the servers iLO event log
     #[tracing::instrument(skip(self))]
     pub async fn get_ilo_event_log(&mut self) -> Result<Vec<LogEvent>, commands::Error> {
         let mut request = String::new();
@@ -45,11 +45,11 @@ impl client::Node {
     }
 
     mod_method!(
-        /// Clears the iLO event log
+        /// Clears the servers iLO event log
         rib_info.clear_ilo_event_log : "clear_eventlog"
     );
 
-    /// Get the IML log of the server
+    /// Returns the servers Integrated Management Log (IML).
     // get_method!(server_info.get_server_event_log : "get_event_log" -> "event_log" : Vec<types::LogEvent>);
     #[tracing::instrument(skip(self))]
     pub async fn get_server_event_log(&mut self) -> Result<Vec<LogEvent>, commands::Error> {
@@ -67,7 +67,7 @@ impl client::Node {
     }
 
     mod_method!(
-        /// Clears server event log
+        /// Clears the servers Integrated Management Log (IML).
         server_info.clear_server_event_log : "clear_iml"
     );
 }

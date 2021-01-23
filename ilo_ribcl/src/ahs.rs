@@ -26,17 +26,18 @@ pub struct AhsStatusInfo {
 
 impl client::Node {
     get_method!(
-        /// get active health system logging status
+        /// Returns the Active Health System (AHS) logging status
         rib_info.get_ahs_status -> AhsStatusInfo, "iL0 4", (Ilo4)
     );
 
     mod_method!(
-        /// Enable or disable AHS logging
+        /// Enable or disable Active Health System (AHS) logging
         rib_info.set_ahs_status(AhsStatusInfo),
         "iL0 4",
         (Ilo4)
     );
 
+    /// Clear the Active Health System (AHS) logging data
     #[tracing::instrument]
     pub async fn ahs_clear_data(&mut self) -> Result<(), crate::commands::Error> {
         assert_fw!(self.firmware(), "iLO 4", (Ilo4));

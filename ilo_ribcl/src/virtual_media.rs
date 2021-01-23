@@ -24,11 +24,11 @@ pub struct VmStatus {
 impl client::Node {
     /*
     get_method!(
-        /// Get the status of virtual media devices
+        /// Return the status of the given virtual media device
         rib_info.get_vm_status(Device) -> VmStatus
     );
     */
-    /// Get the status of virtual media devices
+    /// Returns the status of the given virtual media device
     #[tracing::instrument]
     pub async fn get_vm_status(&mut self, device: Device) -> Result<VmStatus, commands::Error> {
         let mut request = String::new();
@@ -61,7 +61,7 @@ impl client::Node {
         rib_info.set_vm_status(VmStatus)
     );
     */
-    /// Set the parameters of the virtual device specified virtual media.
+    /// Updates the parameters of a virtual media device.
     #[tracing::instrument]
     pub async fn set_vm_status(&mut self, vm_status: VmStatus) -> Result<(), commands::Error> {
         let mut request = String::new();

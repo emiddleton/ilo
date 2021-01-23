@@ -132,29 +132,29 @@ impl client::Node {
     );
 
     get_method!(
-        /// get host data
+        /// Returns host data
         server_info.get_host_data -> Vec<SmbiosRecord>
     );
 
     get_method!(
-        /// get global settings
+        /// Returns the global settings
         rib_info.get_global_settings -> GlobalSettings
     );
 
     mod_method!(
-        /// set global settings
+        /// Update the global settings
         rib_info.mod_global_settings(GlobalSettings)
     );
 
     get_method!(
-        /// get server name
+        /// Returns the server name
         server_info.get_server_name -> "server_name": ServerName,
         "iLO 4 or iLO 3 or iLO 2 version >= 1.30",
         (Ilo4),(Ilo3),(Ilo2,"1.20")
     );
 
     mod_method!(
-        /// set server name
+        /// Update the server name
         server_info.server_name("value": ServerName),
         "iLO 4 or iLO 3 or iLO 2 version >= 1.30",
         (Ilo4),
@@ -181,17 +181,17 @@ impl client::Node {
     */
 
     get_method!(
-        /// get uid status
+        /// Returns the server UID status
         server_info.get_uid_status -> UidMode
     );
 
     mod_method!(
-        /// set uid status
+        /// Update the server UID status
         server_info.uid_control("uid": UidMode)
     );
 
     get_method!(
-        /// get all languages
+        /// Returns all supported languages
         rib_info.get_all_languages -> "get_all_languages" : Vec<Language>,
         "iL0 4 or iL0 3 version >= 1.20",
         (Ilo4),(Ilo3, "1.20")
@@ -212,7 +212,7 @@ impl client::Node {
     */
 
     get_method!(
-        /// get language
+        /// Returns the selected language
         rib_info.get_language -> Language,
         "iL0 4 or iL0 3 version >= 1.20",
         (Ilo4),
@@ -220,7 +220,7 @@ impl client::Node {
     );
 
     mod_method!(
-        /// set language
+        /// Update the language
         rib_info.set_language(Language),
         "iL0 4 or iL0 3 version >= 1.20",
         (Ilo4),

@@ -912,12 +912,12 @@ impl client::Node {
     );
 
     get_method!(
-        /// Whether the server is power on or not
+        /// Returns the power state of the server i.e. if power is on or not
         server_info.get_host_power_status -> "get_host_power" : PowerStatus
     );
 
     get_method!(
-        /// get host power reg info
+        /// Returns the iLO power regulator info
         server_info.get_host_power_reg_info -> HostPowerRegInfo,
         "iLO 2 version >= 1.10",
         (Ilo2,"1.10")
@@ -936,14 +936,14 @@ impl client::Node {
     );
 
     get_method!(
-        /// Get server automatic power on delay setting
+        /// Returns the servers automatic power on and power on delay settings.
         server_info.get_server_auto_pwr -> "^server_auto_pwr" : PowerOnDelay,
         "iLO 4 or iLO 3 or iLO 2 version >= 1.20",
         (Ilo4),(Ilo3),(Ilo2,"1.20")
     );
 
     mod_method!(
-        /// Set the automatic power on delay setting
+        /// Set server automatic power on and delay settings
         server_info.server_auto_pwr("value": PowerOnDelay),
         "iLO 4 or iLO 3 or iLO 2 version >= 1.20",
         (Ilo4),
@@ -952,12 +952,12 @@ impl client::Node {
     );
 
     get_method!(
-        /// get power readings
+        /// Returns the servers power readings from power supply.
         server_info.get_power_readings -> PowerReadings
     );
 
     get_method!(
-        /// get server power on time
+        /// Returns the servers power on time in minutes.
         server_info.get_server_power_on_time -> "server_power_on_minutes": Minutes
     );
 
@@ -971,14 +971,14 @@ impl client::Node {
     );
 
     get_method!(
-        /// Get the configuration of the ProLiant power regulator
+        /// Returns the state of the servers processor power regulator.
         server_info.get_host_power_saver_status -> "get_host_power_saver": HostPowerSaverMode,
         "iLO 4 or iLO 3 or iLO 2 version >= 1.10",
         (Ilo4),(Ilo3),(Ilo2,"1.10")
     );
 
     mod_method!(
-        /// Set the configuration of the ProLiant power regulator
+        /// Set the configuration of the servers processor power regulator.
         server_info.set_host_power_saver("host_power_saver": HostPowerSaverMode),
         "iLO 4 or iLO 3 or iLO 2 version >= 1.10",
         (Ilo4),
@@ -987,7 +987,7 @@ impl client::Node {
     );
 
     get_method!(
-        /// get power cap
+        /// Returns the server power cap.
         server_info.get_power_cap -> "^power_cap" : PowerCap,
         "iLO 4 or iLO 3 or iLO 2 version >= 1.30",
         (Ilo4),
@@ -996,7 +996,7 @@ impl client::Node {
     );
 
     mod_method!(
-        /// Set the power cap
+        /// Sets the servers power cap.
         server_info.set_power_cap("power_cap": PowerCap),
         "iLO 4 or iLO 3 or iLO 2 version >= 1.30",
         (Ilo4),
@@ -1005,7 +1005,7 @@ impl client::Node {
     );
 
     get_method!(
-        /// get host power micro version
+        /// Returns the host power micro version
         server_info.get_host_pwr_micro_ver -> "^pwr_micro$" : PowerMicroVersion
     );
 

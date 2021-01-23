@@ -67,14 +67,14 @@ impl client::Node {
     }
 
     get_method!(
-        /// get two factor settings
+        /// Returns the iLO Two-Factor Authentication settings
         rib_info.get_twofactor_settings -> TwofactorSettings,
         "iL0 2 version >= 1.10",
         (Ilo2, "1.10")
     );
 
     mod_method!(
-        /// set two factor settings
+        /// Update the iLO Two-Factor Authentication settings
         rib_info.mod_twofactor_settings(TwofactorSettings),
         "iL0 2 version >= 1.10",
         (Ilo2, "1.10")

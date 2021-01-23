@@ -31,7 +31,7 @@ pub enum ComputerLock {
 }
 
 impl client::Node {
-    /// Configure whether to use the fqdn or the short hostname for certificate requests
+    /// Configures whether to use the fqdn or the short hostname for certificate requests
     #[tracing::instrument]
     pub async fn cert_fqdn(&mut self, value: bool) -> Result<String, commands::Error> {
         // write
@@ -40,14 +40,14 @@ impl client::Node {
     }
 
     get_method!(
-        /// get certificate subject info
+        /// Returns the certificate subject info
         rib_info.get_cert_subject_info -> "csr_cert_settings" : CsrCertSettings,
         "iL0 2 version >= 2.06",
         (Ilo2, "2.06")
     );
 
     mod_method!(
-        /// set certificate subject info
+        /// Updates the certificate subject info
         rib_info.csr_cert_settings(CsrCertSettings),
         "iLO 2 version >= 2.06",
         (Ilo2, "2.06")
@@ -65,7 +65,7 @@ impl client::Node {
         rib_info.certificate_signing_request -> types::CertificateSigningRequest
     );
     */
-    ///  Get a certificate signing request from the iLO
+    /// Returns a certificate signing request from the iLO
     #[tracing::instrument]
     pub async fn certificate_signing_request(&mut self) -> Result<String, commands::Error> {
         // write
@@ -83,7 +83,7 @@ impl client::Node {
         unimplemented!()
     }
 
-    /// Configure the computer lock settings
+    /// Updates the computer lock setting
     #[tracing::instrument]
     pub async fn computer_lock_config(
         &mut self,

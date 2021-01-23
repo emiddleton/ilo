@@ -22,14 +22,14 @@ pub struct HotkeyConfig {
 //trait KeyboardMouse {
 impl client::Node {
     get_method!(
-        /// get hotkey options
+        /// Returns the hotkey options
         rib_info.get_hotkey_config -> HotkeyConfig,
         "iLO 2",
         (Ilo2)
     );
 
     mod_method!(
-        /// set hotkey options
+        /// Updates the hotkey options
         rib_info.hotkey_config(HotkeyConfig),
         "iLO 2",
         (Ilo2)
