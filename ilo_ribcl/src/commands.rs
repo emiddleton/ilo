@@ -71,6 +71,13 @@ pub enum Error {
         #[cfg(feature = "backtrace")]
         backtrace: Backtrace,
     },
+
+    /// Required field missing on update
+    #[error("field: {target} is required but not set")]
+    FieldMissing {
+        // name of the unset field
+        target: &'static str,
+    },
 }
 
 macro_rules! version_geq {
