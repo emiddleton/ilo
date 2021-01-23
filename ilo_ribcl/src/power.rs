@@ -1009,6 +1009,13 @@ impl client::Node {
         server_info.get_host_pwr_micro_ver -> "^pwr_micro$" : PowerMicroVersion
     );
 
+    /*
+    get_method!(
+        /// Returns iLO power regulator information.
+        server_info.get_pwreg_capabilities -> PwregCapabilities
+        (Ilo2)
+    )
+    */
     get_method!(
         /// get power alert threshold settings
         server_info.get_pwreg -> Pwreg,

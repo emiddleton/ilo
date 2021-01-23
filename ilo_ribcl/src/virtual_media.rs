@@ -15,7 +15,7 @@ use std::{convert::TryInto, fmt::Write};
 pub struct VmStatus {
     pub vm_applet: Option<String>,   // CONNECTED | DISCONNECTED
     pub device: Option<Device>,      // FLOPPY || CDROM
-    pub boot_option: Option<String>, // BOOT_ALWAYS | BOOT_ONCE | NO_BOOT
+    pub boot_option: Option<String>, // BOOT_ALWAYS | BOOT_ONCE | NO_BOOT | CONNECT | DISCONNECT
     pub write_protect: Option<bool>,
     pub image_inserted: Option<bool>,
     pub image_url: Option<Url>,
