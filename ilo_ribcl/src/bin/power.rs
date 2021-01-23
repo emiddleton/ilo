@@ -42,7 +42,7 @@ async fn main() -> Result<()> {
         "off" => {
             if opt.force {
                 if let PowerStatus::On = node.get_host_power_status().await? {
-                    node.press_pwr_btn().await?;
+                    node.hold_pwr_btn().await?;
                 } else {
                     println!("the server is already powered off");
                 }

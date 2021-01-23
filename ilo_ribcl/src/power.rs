@@ -906,9 +906,10 @@ impl client::Node {
     //    "iLO 4 or iLO 2", (Ilo4), (Ilo2)
     // );
     //
-    // mod_method!(
-    //    /// Will power off the server if on
-    //    server_info.hold_pwr_btn
+    mod_method!(
+        /// Will power off the server if on
+        server_info.hold_pwr_btn
+    );
 
     get_method!(
         /// Whether the server is power on or not
