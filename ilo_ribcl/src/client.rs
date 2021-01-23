@@ -112,7 +112,7 @@ pub enum Error {
     },
 
     #[error("failed to determine node protocol version")]
-    AutodetectFailed,
+    AutodetectFailed { source: Box<commands::Error> },
 
     #[error("unrecognized firmware version")]
     UnrecognizedFirmware(FwVersion),
@@ -243,11 +243,14 @@ impl Node {
             }
             _ => {
                 node.client = Some(Box::new(TlsClient::new(auth.clone())));
-                node.firmware = Some(
-                    node.get_fw_version()
-                        .await
-                        .or(Err(Error::AutodetectFailed))?,
-                );
+                node.firmware =
+                    Some(
+                        node.get_fw_version()
+                            .await
+                            .map_err(|err| Error::AutodetectFailed {
+                                source: Box::new(err),
+                            })?,
+                    );
             }
         }
         Ok(node)
