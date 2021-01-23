@@ -38,12 +38,19 @@ pub struct NetworkSettings {
     pub ip_address: Option<Ip4Address>,
     pub subnet_mask: Option<Ip4SubnetMask>,
     pub gateway_ip_address: Option<Ip4Address>,
+    // iLO 2 Subsystem Name
     pub dns_name: Option<HostName>,
+    // Domain Name
     pub domain_name: Option<DomainName>,
+    // Primary DNS Server
     pub prim_dns_server: Option<Ip4Address>,
+    /// Secondary DNS Server
     pub sec_dns_server: Option<Ip4Address>,
+    /// Tertiary DNS Server
     pub ter_dns_server: Option<Ip4Address>,
+    /// Primary WINS Server
     pub prim_wins_server: Option<Ip4Address>,
+    /// Secondary WINS Server
     pub sec_wins_server: Option<Ip4Address>,
 
     #[ribcl(map = "{dest,gateway}")]
